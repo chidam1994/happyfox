@@ -29,8 +29,8 @@ type PhNum struct {
 type Contact struct {
 	Id     uuid.UUID
 	Name   string
-	Emails []Email
-	PhNums []PhNum
+	Emails []*Email
+	PhNums []*PhNum
 }
 
 type Group struct {
