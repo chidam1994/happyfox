@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/chidam1994/happyfox/config"
 	"github.com/chidam1994/happyfox/server/handlers"
 	"github.com/gorilla/mux"
 )
@@ -25,7 +26,7 @@ func main() {
 	srv := &http.Server{
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
-		Addr:         ":8080",
+		Addr:         config.GetString("port"),
 		ErrorLog:     logger,
 	}
 	err := srv.ListenAndServe()
