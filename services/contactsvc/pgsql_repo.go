@@ -2,11 +2,13 @@ package contactsvc
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 
 	"github.com/chidam1994/happyfox/models"
 	"github.com/chidam1994/happyfox/utils"
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
 	"gopkg.in/gorp.v2"
 )
 
@@ -76,8 +78,20 @@ func (repo *PgsqlRepo) Delete(contactId uuid.UUID) error {
 	return nil
 }
 
-func (repo *PgsqlRepo) Find(filterMap map[string]string) ([]*models.Contact, error) {
-	panic("not implemented")
+func (repo *PgsqlRepo) Find(filterMap map[Filter]string) ([]models.Contact, error) {
+	results := []models.Contact{}
+	var query string
+	if len(filterMap) > 0 {
+		query = fmt.Sprintf("select distinct contacts.id, contacts.name, contacts.created_at from contacts left join emails on contacts.id = emails.contact_id left join phnumbers on contacts.id = phnumbers.contact_id where %s order by contacts.created_at", GetSearchCondition(filterMap))
+	} else {
+		return results, utils.GetAppError(errors.New("no search filters specified"), "error while searching for contact", http.StatusBadRequest)
+	}
+	_, err := repo.DbMap.Select(&results, query)
+	if err != nil {
+		return results, utils.GetAppError(err, "error while deleting contact", http.StatusInternalServerError)
+	}
+	fmt.Println(results[1].Name)
+	return results, nil
 }
 
 func (repo *PgsqlRepo) FindById(contactId uuid.UUID) (*models.Contact, error) {
@@ -110,4 +124,24 @@ func (repo *PgsqlRepo) FindEmail(contactId uuid.UUID, email string) (*models.Ema
 
 func (repo *PgsqlRepo) FindPhNum(contactId uuid.UUID, phNum string) (*models.PhNum, error) {
 	panic("not implemented")
+}
+
+func GetSearchCondition(filtersMap map[Filter]string) string {
+	result := ""
+	if value, ok := filtersMap[NameFilter]; ok {
+		result = result + fmt.Sprintf("contacts.name like '%%%s%%' ", value)
+	}
+	if value, ok := filtersMap[EmailFilter]; ok {
+		if len(result) > 0 {
+			result = result + "or "
+		}
+		result = result + fmt.Sprintf("emails.email_id like '%%%s%%' ", value)
+	}
+	if value, ok := filtersMap[PhoneFilter]; ok {
+		if len(result) > 0 {
+			result = result + "or "
+		}
+		result = result + fmt.Sprintf("phnumbers.phnum like '%%%s%%'", value)
+	}
+	return result
 }

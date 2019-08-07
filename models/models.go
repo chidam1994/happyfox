@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -19,14 +20,14 @@ func (tag Tag) String() string {
 	return tags[tag]
 }
 
-func GetTag(tagstr string) Tag {
+func GetTag(tagstr string) (Tag, error) {
 	tags := [...]string{"Work", "Personal"}
 	for i := range tags {
 		if strings.ToLower(tags[i]) == strings.ToLower(tagstr) {
-			return Tag(i)
+			return Tag(i), nil
 		}
 	}
-	return Tag(0)
+	return Tag(0), fmt.Errorf("error converting string: %s to Tag", tagstr)
 }
 
 type Email struct {

@@ -74,16 +74,15 @@ func (repo *InMemRepo) Delete(contactId uuid.UUID) (err error) {
 	return nil
 }
 
-func (repo *InMemRepo) Find(filterMap map[string]string) (results []*models.Contact, err error) {
+func (repo *InMemRepo) Find(filterMap map[Filter]string) (results []models.Contact, err error) {
 	for _, contact := range repo.contactsMap {
-		addToResult := true
-		if filterValue, ok := filterMap["name"]; ok {
-			if !strings.Contains(strings.ToLower(contact.Name), strings.ToLower(filterValue)) {
-				addToResult = false
+		if filterValue, ok := filterMap[NameFilter]; ok {
+			if strings.Contains(strings.ToLower(contact.Name), strings.ToLower(filterValue)) {
+				results = append(results, *contact)
 				continue
 			}
 		}
-		if filterValue, ok := filterMap["email"]; ok {
+		if filterValue, ok := filterMap[EmailFilter]; ok {
 			emailMatch := false
 			for _, email := range contact.Emails {
 				if strings.Contains(strings.ToLower(email.Id), strings.ToLower(filterValue)) {
@@ -91,12 +90,12 @@ func (repo *InMemRepo) Find(filterMap map[string]string) (results []*models.Cont
 					break
 				}
 			}
-			if !emailMatch {
-				addToResult = false
+			if emailMatch {
+				results = append(results, *contact)
 				continue
 			}
 		}
-		if filterValue, ok := filterMap["phNum"]; ok {
+		if filterValue, ok := filterMap[PhoneFilter]; ok {
 			phNumMatch := false
 			for _, phNum := range contact.PhNums {
 				if strings.Contains(strings.ToLower(phNum.Number), strings.ToLower(filterValue)) {
@@ -104,13 +103,10 @@ func (repo *InMemRepo) Find(filterMap map[string]string) (results []*models.Cont
 					break
 				}
 			}
-			if !phNumMatch {
-				addToResult = false
+			if phNumMatch {
+				results = append(results, *contact)
 				continue
 			}
-		}
-		if addToResult {
-			results = append(results, contact)
 		}
 	}
 	return

@@ -1,6 +1,7 @@
 package contactsvc
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -20,6 +21,27 @@ func NewService(r Repository) *Service {
 	}
 }
 
+type Filter string
+
+const (
+	NameFilter  Filter = "name"
+	EmailFilter Filter = "email"
+	PhoneFilter Filter = "phnum"
+)
+
+func GetFilter(filterStr string) (Filter, error) {
+	filterMap := map[string]Filter{
+		"name":  NameFilter,
+		"email": EmailFilter,
+		"phnum": PhoneFilter,
+	}
+	filter, ok := filterMap[filterStr]
+	if !ok {
+		return Filter(""), fmt.Errorf("error converting string %s to filter", filterStr)
+	}
+	return filter, nil
+}
+
 func (svc *Service) SaveContact(contact *models.Contact) (contactId uuid.UUID, err error) {
 	contact.Id = uuid.New()
 	contact.CreatedAt = time.Now()
@@ -33,6 +55,10 @@ func (svc *Service) SaveContact(contact *models.Contact) (contactId uuid.UUID, e
 		return contactId, utils.GetAppError(errors.New("Contact with the specified name already exists"), "Unable to create contact", http.StatusConflict)
 	}
 	return svc.repo.Save(contact)
+}
+
+func (svc *Service) FindContacts(filterMap map[Filter]string) ([]models.Contact, error) {
+	return svc.repo.Find(filterMap)
 }
 
 func (svc *Service) DeleteContact(contactId uuid.UUID) error {
