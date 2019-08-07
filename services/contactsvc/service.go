@@ -61,6 +61,10 @@ func (svc *Service) FindContacts(filterMap map[Filter]string) ([]models.Contact,
 	return svc.repo.Find(filterMap)
 }
 
+func (svc *Service) GetContact(contactId uuid.UUID) (*models.Contact, error) {
+	return svc.repo.FindById(contactId)
+}
+
 func (svc *Service) DeleteContact(contactId uuid.UUID) error {
 	contact, err := svc.repo.FindById(contactId)
 	if err != nil {

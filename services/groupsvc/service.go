@@ -46,6 +46,10 @@ func (svc *Service) DeleteGroup(groupId uuid.UUID) error {
 	return svc.repo.Delete(groupId)
 }
 
+func (svc *Service) GetGroup(groupId uuid.UUID) (*models.Group, error) {
+	return svc.repo.FindById(groupId)
+}
+
 func beforeSave(group *models.Group, groupId uuid.UUID) {
 	now := time.Now()
 	for i := range group.Members {

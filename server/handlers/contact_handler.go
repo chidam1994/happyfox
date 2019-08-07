@@ -53,6 +53,28 @@ func deleteContact(svc *contactsvc.Service) func(w http.ResponseWriter, r *http.
 		w = utils.GetSuccessReqResponse(w)
 	}
 }
+
+func getContact(svc *contactsvc.Service) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		idstr := vars["id"]
+		id, err := uuid.Parse(idstr)
+		if err != nil {
+			w = utils.GetBadReqResponse(w, "invalid uuid in request")
+			return
+		}
+		contact, err := svc.GetContact(id)
+		if err != nil {
+			w = utils.GetFailureResponse(w, err)
+			return
+		}
+		if err := json.NewEncoder(w).Encode(contact); err != nil {
+			w = utils.GetBadReqResponse(w, err.Error())
+			w.Write([]byte(err.Error()))
+		}
+	}
+}
+
 func searchContact(svc *contactsvc.Service) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		values := r.URL.Query()
@@ -84,4 +106,5 @@ func InitContactHandlers(r *mux.Router, service *contactsvc.Service) {
 	r.HandleFunc("", createContact(service)).Methods("POST", "OPTIONS")
 	r.HandleFunc("/{id}", deleteContact(service)).Methods("DELETE", "OPTIONS")
 	r.HandleFunc("/search", searchContact(service)).Methods("GET", "OPTIONS")
+	r.HandleFunc("/{id}", getContact(service)).Methods("GET", "OPTIONS")
 }

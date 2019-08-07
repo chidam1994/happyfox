@@ -31,19 +31,19 @@ func GetTag(tagstr string) (Tag, error) {
 }
 
 type Email struct {
-	ContactId uuid.UUID `db:"contact_id"`
+	ContactId uuid.UUID `db:"contact_id" json:"-"`
 	Id        string    `db:"email_id" json:"email_id"`
 	Tag       Tag       `db:"tag" json:"tag"`
-	CreatedAt time.Time `db:"created_at"`
-	UpdatedAt time.Time `db:"updated_at"`
+	CreatedAt time.Time `db:"created_at" json:"-"`
+	UpdatedAt time.Time `db:"updated_at" json:"-"`
 }
 
 type PhNum struct {
-	ContactId uuid.UUID `db:"contact_id"`
+	ContactId uuid.UUID `db:"contact_id" json:"-"`
 	Number    string    `db:"phnum" json:"phnum"`
 	Tag       Tag       `db:"tag" json:"tag"`
-	CreatedAt time.Time `db:"created_at"`
-	UpdatedAt time.Time `db:"updated_at"`
+	CreatedAt time.Time `db:"created_at" json:"-"`
+	UpdatedAt time.Time `db:"updated_at" json:"-"`
 }
 
 type Contact struct {

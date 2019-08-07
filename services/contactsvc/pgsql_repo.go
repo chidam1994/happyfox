@@ -102,6 +102,18 @@ func (repo *PgsqlRepo) FindById(contactId uuid.UUID) (*models.Contact, error) {
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
+	emails := []*models.Email{}
+	_, err = repo.DbMap.Select(&emails, "select * from emails where contact_id= $1", contactId)
+	if err != nil && err != sql.ErrNoRows {
+		return nil, utils.GetAppError(err, "error while finding contact by Id", http.StatusInternalServerError)
+	}
+	result.Emails = emails
+	phNums := []*models.PhNum{}
+	_, err = repo.DbMap.Select(&phNums, "select * from phnumbers where contact_id= $1", contactId)
+	if err != nil && err != sql.ErrNoRows {
+		return nil, utils.GetAppError(err, "error while finding contact by Id", http.StatusInternalServerError)
+	}
+	result.PhNums = phNums
 	return &result, nil
 }
 

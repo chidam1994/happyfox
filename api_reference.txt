@@ -1,6 +1,30 @@
 Health check
 	{{host}}/health
 	resp will have http code 200 if app is running
+Read contact-
+	{{host}}/contact/{id}
+	method - get 
+	response -
+	{
+	    "id": "4470b517-5471-412c-b1a0-3def2cb82b1d",
+	    "name": "tesssfest",
+	    "emails": [
+		{
+		    "email_id": "a@b",
+		    "tag": 1
+		},
+		{
+		    "email_id": "ef@gh.cd",
+		    "tag": 0
+		}
+	    ],
+	    "phnums": [
+		{
+		    "phnum": "a@b",
+		    "tag": 1
+		}
+	    ]
+	}
 
 Create contact -
 	{{host}}/contact
@@ -54,6 +78,22 @@ Search contacts-
 		"name": "tesssfest"
 	    }
 	]
+Read group-
+	{{host}}/group/{id}
+	method - get 
+	response -
+	{
+	    "id": "39d3df03-833d-46ed-a821-5673326c296e",
+	    "name": "testgroup",
+	    "Members": [
+		{
+		    "member_id": "4470b517-5471-412c-b1a0-3def2cb82b1d"
+		},
+		{
+		    "member_id": "1d5e9b39-0888-4e1b-85bb-20b272943554"
+		}
+	    ]
+	}
 
 Create group-
 	{{host}}/group
@@ -75,5 +115,4 @@ delete group-
 Note-
 	*validations have been added for all the request parameters and request body
 	*appropriate errors with the proper http status code will be returned in case of error
-	*apis to read and update the resources are yet to be implemented.
-
+	*apis to update the resources are yet to be implemented.

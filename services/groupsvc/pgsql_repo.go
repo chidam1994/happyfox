@@ -89,5 +89,11 @@ func (repo *PgsqlRepo) FindById(groupId uuid.UUID) (*models.Group, error) {
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
+	members := []*models.Member{}
+	_, err = repo.DbMap.Select(&members, "select * from members where group_id= $1", groupId)
+	if err != nil && err != sql.ErrNoRows {
+		return nil, utils.GetAppError(err, "error while finding group by Id", http.StatusInternalServerError)
+	}
+	result.Members = members
 	return &result, nil
 }
