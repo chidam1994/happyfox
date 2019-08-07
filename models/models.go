@@ -1,6 +1,7 @@
 package models
 
 import (
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -18,14 +19,30 @@ func (tag Tag) String() string {
 	return tags[tag]
 }
 
+func GetTag(tagstr string) Tag {
+	tags := [...]string{"Work", "Personal"}
+	for i := range tags {
+		if strings.ToLower(tags[i]) == strings.ToLower(tagstr) {
+			return Tag(i)
+		}
+	}
+	return Tag(0)
+}
+
 type Email struct {
-	Id  string
-	Tag Tag
+	ContactId uuid.UUID `db:"contact_id"`
+	Id        string    `db:"email_id"`
+	Tag       Tag       `db:"tag"`
+	CreatedAt time.Time `db:"created_at"`
+	UpdatedAt time.Time `db:"updated_at"`
 }
 
 type PhNum struct {
-	Number string
-	Tag    Tag
+	ContactId uuid.UUID `db:"contact_id"`
+	Number    string    `db:"phnum"`
+	Tag       Tag       `db:"tag"`
+	CreatedAt time.Time `db:"created_at"`
+	UpdatedAt time.Time `db:"updated_at"`
 }
 
 type Contact struct {

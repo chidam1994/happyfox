@@ -1,6 +1,7 @@
 package contactsvc
 
 import (
+	"database/sql"
 	"net/http"
 
 	"github.com/chidam1994/happyfox/models"
@@ -21,13 +22,33 @@ func NewPgsqlRepo(dbMap *gorp.DbMap) *PgsqlRepo {
 }
 
 func (repo *PgsqlRepo) Save(contact *models.Contact) (contactId uuid.UUID, err error) {
-	err = repo.DbMap.Insert(contact)
+	trans, err := repo.DbMap.Begin()
 	if err != nil {
-		appError := &utils.AppError{
-			Code: http.StatusInternalServerError,
-			Err:  errors.Wrap(err, "error while saving contact"),
-		}
-		return contactId, appError
+		return contactId, utils.GetAppError(err, "error while saving contact", http.StatusInternalServerError)
+	}
+	err = trans.Insert(contact)
+	if err != nil {
+		return contactId, utils.GetAppError(err, "error while saving contact", http.StatusInternalServerError)
+	}
+	temp := make([]interface{}, len(contact.Emails))
+	for i, val := range contact.Emails {
+		temp[i] = val
+	}
+	err = trans.Insert(temp...)
+	if err != nil {
+		return contactId, utils.GetAppError(err, "error while saving contact", http.StatusInternalServerError)
+	}
+	temp = make([]interface{}, len(contact.PhNums))
+	for i, val := range contact.PhNums {
+		temp[i] = val
+	}
+	err = trans.Insert(temp...)
+	if err != nil {
+		return contactId, utils.GetAppError(err, "error while saving contact", http.StatusInternalServerError)
+	}
+	err = trans.Commit()
+	if err != nil {
+		return contactId, utils.GetAppError(err, "error while saving contact", http.StatusInternalServerError)
 	}
 	return contact.Id, nil
 }
@@ -63,12 +84,15 @@ func (repo *PgsqlRepo) FindById(contactId uuid.UUID) (*models.Contact, error) {
 func (repo *PgsqlRepo) FindByName(name string) (*models.Contact, error) {
 	result := models.Contact{}
 	err := repo.DbMap.SelectOne(&result, "select * from contacts where name= $1", name)
-	if err != nil {
+	if err != nil && err != sql.ErrNoRows {
 		appError := &utils.AppError{
 			Code: http.StatusInternalServerError,
 			Err:  errors.Wrap(err, "error while finding contact by name"),
 		}
 		return nil, appError
+	}
+	if err == sql.ErrNoRows {
+		return nil, nil
 	}
 	return &result, nil
 }

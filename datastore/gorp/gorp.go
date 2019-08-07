@@ -22,6 +22,8 @@ func InitDB() *gorp.DbMap {
 	dbmap := &gorp.DbMap{Db: db, Dialect: gorp.PostgresDialect{}}
 
 	dbmap.AddTableWithName(models.Contact{}, "contacts")
+	dbmap.AddTableWithName(models.Email{}, "emails")
+	dbmap.AddTableWithName(models.PhNum{}, "phnumbers")
 	return dbmap
 }
 

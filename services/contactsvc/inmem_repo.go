@@ -134,7 +134,7 @@ func (repo *InMemRepo) FindByName(name string) (contact *models.Contact, err err
 			return contact, nil
 		}
 	}
-	return nil, errors.New("Contact Not found")
+	return nil, nil
 }
 
 func (repo *InMemRepo) FindEmail(contactId uuid.UUID, emailstr string) (email *models.Email, err error) {
