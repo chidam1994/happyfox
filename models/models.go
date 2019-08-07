@@ -32,27 +32,27 @@ func GetTag(tagstr string) (Tag, error) {
 
 type Email struct {
 	ContactId uuid.UUID `db:"contact_id"`
-	Id        string    `db:"email_id"`
-	Tag       Tag       `db:"tag"`
+	Id        string    `db:"email_id",json:"email_id"`
+	Tag       Tag       `db:"tag",json:"tag"`
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
 }
 
 type PhNum struct {
 	ContactId uuid.UUID `db:"contact_id"`
-	Number    string    `db:"phnum"`
-	Tag       Tag       `db:"tag"`
+	Number    string    `db:"phnum",json:"phnum"`
+	Tag       Tag       `db:"tag",json:"tag"`
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
 }
 
 type Contact struct {
-	Id        uuid.UUID `db:"id, primarykey"`
-	Name      string    `db:"name"`
+	Id        uuid.UUID `db:"id, primarykey",json:"id"`
+	Name      string    `db:"name",json:"name"`
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
-	Emails    []*Email  `db:"-"`
-	PhNums    []*PhNum  `db:"-"`
+	Emails    []*Email  `db:"-",json:"emails"`
+	PhNums    []*PhNum  `db:"-",json:"phnums"`
 }
 
 type Group struct {

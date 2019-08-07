@@ -16,10 +16,10 @@ import (
 func main() {
 	r := mux.NewRouter()
 
-	_ = contactsvc.NewService(contactsvc.NewPgsqlRepo(gorp.InitDB()))
+	contactService := contactsvc.NewService(contactsvc.NewPgsqlRepo(gorp.InitDB()))
 	defer gorp.CloseDBConn()
 	contactRouter := r.PathPrefix("/contact").Subrouter()
-	handlers.InitContactHandlers(contactRouter)
+	handlers.InitContactHandlers(contactRouter, contactService)
 
 	http.Handle("/", r)
 	r.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
