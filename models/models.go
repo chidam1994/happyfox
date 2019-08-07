@@ -56,7 +56,9 @@ type Contact struct {
 }
 
 type Group struct {
-	Id      uuid.UUID
-	Name    string
-	Members []uuid.UUID
+	Id        uuid.UUID   `db:"id, primarykey" json:"id"`
+	Name      string      `db:"name" json:"name"`
+	Members   []uuid.UUID `db:"-" json"members"`
+	CreatedAt time.Time   `db:"created_at" json:"-"`
+	UpdatedAt time.Time   `db:"updated_at" json:"-"`
 }
