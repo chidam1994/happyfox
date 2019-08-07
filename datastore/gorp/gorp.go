@@ -24,6 +24,8 @@ func InitDB() *gorp.DbMap {
 	dbmap.AddTableWithName(models.Contact{}, "contacts")
 	dbmap.AddTableWithName(models.Email{}, "emails")
 	dbmap.AddTableWithName(models.PhNum{}, "phnumbers")
+	dbmap.AddTableWithName(models.Group{}, "groups")
+	dbmap.AddTableWithName(models.Member{}, "members")
 	return dbmap
 }
 

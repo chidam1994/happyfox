@@ -24,6 +24,7 @@ func (svc *Service) SaveGroup(group *models.Group) (groupId uuid.UUID, err error
 	group.Id = uuid.New()
 	group.CreatedAt = time.Now()
 	group.UpdatedAt = time.Now()
+	beforeSave(group, group.Id)
 	existingGroup, err := svc.repo.FindByName(group.Name)
 	if err != nil {
 		return groupId, err
@@ -32,4 +33,13 @@ func (svc *Service) SaveGroup(group *models.Group) (groupId uuid.UUID, err error
 		return groupId, utils.GetAppError(errors.New("Group with the specified name already exists"), "Unable to create group", http.StatusConflict)
 	}
 	return svc.repo.Save(group)
+}
+
+func beforeSave(group *models.Group, groupId uuid.UUID) {
+	now := time.Now()
+	for i := range group.Members {
+		group.Members[i].GroupId = groupId
+		group.Members[i].CreatedAt = now
+		group.Members[i].UpdatedAt = now
+	}
 }

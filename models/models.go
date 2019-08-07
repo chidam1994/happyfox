@@ -56,9 +56,16 @@ type Contact struct {
 }
 
 type Group struct {
-	Id        uuid.UUID   `db:"id, primarykey" json:"id"`
-	Name      string      `db:"name" json:"name"`
-	Members   []uuid.UUID `db:"-" json"members"`
-	CreatedAt time.Time   `db:"created_at" json:"-"`
-	UpdatedAt time.Time   `db:"updated_at" json:"-"`
+	Id        uuid.UUID `db:"id, primarykey" json:"id"`
+	Name      string    `db:"name" json:"name"`
+	Members   []*Member `db:"-" json"members"`
+	CreatedAt time.Time `db:"created_at" json:"-"`
+	UpdatedAt time.Time `db:"updated_at" json:"-"`
+}
+
+type Member struct {
+	GroupId   uuid.UUID `db:"group_id" json:"-"`
+	MemberId  uuid.UUID `db:"member_id" json:"member_id"`
+	CreatedAt time.Time `db:"created_at" json:"-"`
+	UpdatedAt time.Time `db:"updated_at" json:"-"`
 }
