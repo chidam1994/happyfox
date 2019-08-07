@@ -17,7 +17,7 @@ type CreateContactRequest struct {
 	PhNums []*PhNum `json:"phnums"`
 }
 
-type CreateContactResponse struct {
+type ContactId struct {
 	Id string `json:"id"`
 }
 

@@ -6,6 +6,7 @@ import (
 
 	"github.com/chidam1994/happyfox/services/contactsvc"
 	"github.com/chidam1994/happyfox/utils"
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
 
@@ -27,7 +28,7 @@ func createContact(svc *contactsvc.Service) func(w http.ResponseWriter, r *http.
 			w = utils.GetBadReqResponse(w, err.Error())
 			return
 		}
-		data := &CreateContactResponse{Id: id.String()}
+		data := &ContactId{Id: id.String()}
 		if err := json.NewEncoder(w).Encode(data); err != nil {
 			w = utils.GetBadReqResponse(w, err.Error())
 			w.Write([]byte(err.Error()))
@@ -35,6 +36,25 @@ func createContact(svc *contactsvc.Service) func(w http.ResponseWriter, r *http.
 	}
 }
 
+func deleteContact(svc *contactsvc.Service) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		idstr := vars["id"]
+		id, err := uuid.Parse(idstr)
+		if err != nil {
+			w = utils.GetBadReqResponse(w, "invalid uuid in request")
+			return
+		}
+		err = svc.DeleteContact(id)
+		if err != nil {
+			w = utils.GetBadReqResponse(w, err.Error())
+			return
+		}
+		w = utils.GetSuccessReqResponse(w)
+	}
+}
+
 func InitContactHandlers(r *mux.Router, service *contactsvc.Service) {
-	r.HandleFunc("/create", createContact(service)).Methods("POST", "OPTIONS")
+	r.HandleFunc("", createContact(service)).Methods("POST", "OPTIONS")
+	r.HandleFunc("/{id}", deleteContact(service)).Methods("DELETE", "OPTIONS")
 }
