@@ -32,27 +32,27 @@ func GetTag(tagstr string) (Tag, error) {
 
 type Email struct {
 	ContactId uuid.UUID `db:"contact_id"`
-	Id        string    `db:"email_id",json:"email_id"`
-	Tag       Tag       `db:"tag",json:"tag"`
+	Id        string    `db:"email_id" json:"email_id"`
+	Tag       Tag       `db:"tag" json:"tag"`
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
 }
 
 type PhNum struct {
 	ContactId uuid.UUID `db:"contact_id"`
-	Number    string    `db:"phnum",json:"phnum"`
-	Tag       Tag       `db:"tag",json:"tag"`
+	Number    string    `db:"phnum" json:"phnum"`
+	Tag       Tag       `db:"tag" json:"tag"`
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
 }
 
 type Contact struct {
-	Id        uuid.UUID `db:"id, primarykey",json:"id"`
-	Name      string    `db:"name",json:"name"`
-	CreatedAt time.Time `db:"created_at"`
-	UpdatedAt time.Time `db:"updated_at"`
-	Emails    []*Email  `db:"-",json:"emails"`
-	PhNums    []*PhNum  `db:"-",json:"phnums"`
+	Id        uuid.UUID `db:"id, primarykey" json:"id"`
+	Name      string    `db:"name" json:"name"`
+	CreatedAt time.Time `db:"created_at" json:"-"`
+	UpdatedAt time.Time `db:"updated_at" json:"-"`
+	Emails    []*Email  `db:"-" json:"emails,omitempty"`
+	PhNums    []*PhNum  `db:"-" json:"phnums,omitempty"`
 }
 
 type Group struct {

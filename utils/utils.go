@@ -18,6 +18,18 @@ func GetBadReqResponse(w http.ResponseWriter, errMsg string) http.ResponseWriter
 	}
 	return w
 }
+func GetFailureResponse(w http.ResponseWriter, err error) http.ResponseWriter {
+	respBody := &Response{Error: err.Error()}
+	if appError, ok := err.(*AppError); ok {
+		w.WriteHeader(appError.Code)
+	} else {
+		w.WriteHeader(http.StatusBadRequest)
+	}
+	if err := json.NewEncoder(w).Encode(respBody); err != nil {
+		w.Write([]byte(err.Error()))
+	}
+	return w
+}
 func GetSuccessReqResponse(w http.ResponseWriter) http.ResponseWriter {
 	respBody := &Response{Success: true}
 	w.WriteHeader(http.StatusOK)

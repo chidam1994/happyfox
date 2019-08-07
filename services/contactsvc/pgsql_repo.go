@@ -90,7 +90,6 @@ func (repo *PgsqlRepo) Find(filterMap map[Filter]string) ([]models.Contact, erro
 	if err != nil {
 		return results, utils.GetAppError(err, "error while deleting contact", http.StatusInternalServerError)
 	}
-	fmt.Println(results[1].Name)
 	return results, nil
 }
 

@@ -25,7 +25,7 @@ func createContact(svc *contactsvc.Service) func(w http.ResponseWriter, r *http.
 		}
 		id, err := svc.SaveContact(contact)
 		if err != nil {
-			w = utils.GetBadReqResponse(w, err.Error())
+			w = utils.GetFailureResponse(w, err)
 			return
 		}
 		data := &ContactId{Id: id.String()}
@@ -47,14 +47,41 @@ func deleteContact(svc *contactsvc.Service) func(w http.ResponseWriter, r *http.
 		}
 		err = svc.DeleteContact(id)
 		if err != nil {
-			w = utils.GetBadReqResponse(w, err.Error())
+			w = utils.GetFailureResponse(w, err)
 			return
 		}
 		w = utils.GetSuccessReqResponse(w)
 	}
 }
-
+func searchContact(svc *contactsvc.Service) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		values := r.URL.Query()
+		filtersMap := make(map[contactsvc.Filter]string)
+		for key, val := range values {
+			filter, err := contactsvc.GetFilter(key)
+			if err != nil {
+				w = utils.GetBadReqResponse(w, "unrecognized query params present in request")
+				return
+			}
+			if len(val) > 1 {
+				w = utils.GetBadReqResponse(w, "only one value can be specified for a filter")
+				return
+			}
+			filtersMap[filter] = val[0]
+		}
+		results, err := svc.FindContacts(filtersMap)
+		if err != nil {
+			w = utils.GetFailureResponse(w, err)
+			return
+		}
+		if err := json.NewEncoder(w).Encode(results); err != nil {
+			w = utils.GetBadReqResponse(w, err.Error())
+			w.Write([]byte(err.Error()))
+		}
+	}
+}
 func InitContactHandlers(r *mux.Router, service *contactsvc.Service) {
 	r.HandleFunc("", createContact(service)).Methods("POST", "OPTIONS")
 	r.HandleFunc("/{id}", deleteContact(service)).Methods("DELETE", "OPTIONS")
+	r.HandleFunc("/search", searchContact(service)).Methods("GET", "OPTIONS")
 }
