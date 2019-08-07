@@ -1,0 +1,79 @@
+Health check
+	{{host}}/health
+	resp will have http code 200 if app is running
+
+Create contact -
+	{{host}}/contact
+	method - post
+	request body (json) -
+	{
+		"name":"ffsfedgd",
+		"emails":[
+			{
+				"email_id":"a@b",
+				"tag":"personal"
+			},
+			{
+				"email_id":"ef@gh.cd",
+				"tag":"work"
+			}
+		],
+		"phnums":[
+			{
+				"number":"9842422266",
+				"tag":"work"
+			}
+		]
+	}
+
+	response body (json) -
+	{"id":"1d818221-213d-4f6e-b0d6-3eb10a223f35"}
+
+Delete contact-
+	{{host}}/contact/{id}
+	method - delete
+	response -
+	{"success":true}
+
+Search contacts-
+	{{host}}/contact/search?name=abcd&phnum=346
+	the query params that can be used are (name,phnum and email)
+	All the contacts that contain any of the query param value will be returned in the order in which they were created
+	response - 
+	[
+	    {
+		"id": "1d5e9b39-0888-4e1b-85bb-20b272943554",
+		"name": "test"
+	    },
+	    {
+		"id": "199178f7-0f1f-4e85-b3ab-a961e89859ab",
+		"name": "tessst"
+	    },
+	    {
+		"id": "4470b517-5471-412c-b1a0-3def2cb82b1d",
+		"name": "tesssfest"
+	    }
+	]
+
+Create group-
+	{{host}}/group
+	method - post
+	request body json -
+	{
+		"name":"testgroup1",
+		"members":["4470b517-5471-412c-b1a0-3def2cb82b1d","1d5e9b39-0888-4e1b-85bb-20b272943554"]
+	}
+	response body -
+	{"id":"1d818221-213d-4f6e-b0d6-3eb10a223f35"}
+
+delete group-
+	{{host}}/group/{id}
+	method - delete 
+	response -
+	{"success":true}
+
+Note-
+	*validations have been added for all the request parameters and request body
+	*appropriate errors with the proper http status code will be returned in case of error
+	*apis to read and update the resources are yet to be implemented.
+
