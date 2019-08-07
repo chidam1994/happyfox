@@ -1,7 +1,7 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE phnumbers (
-    contact_id UUID NOT NULL,
+    contact_id UUID NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
     phnum VARCHAR,
     tag VARCHAR,
     created_at TIMESTAMP NOT NULL,

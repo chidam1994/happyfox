@@ -35,6 +35,17 @@ func (svc *Service) SaveContact(contact *models.Contact) (contactId uuid.UUID, e
 	return svc.repo.Save(contact)
 }
 
+func (svc *Service) DeleteContact(contactId uuid.UUID) error {
+	contact, err := svc.repo.FindById(contactId)
+	if err != nil {
+		return err
+	}
+	if contact == nil {
+		return utils.GetAppError(errors.New("The contact you're trying to delete doesnt exist"), "Unable to Delete contact", http.StatusConflict)
+	}
+	return svc.repo.Delete(contactId)
+}
+
 func beforeSave(contact *models.Contact, contactId uuid.UUID) {
 	now := time.Now()
 	for i := range contact.Emails {

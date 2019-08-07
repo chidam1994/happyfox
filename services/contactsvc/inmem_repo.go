@@ -70,10 +70,6 @@ func (repo *InMemRepo) RemPhNum(contactId uuid.UUID, phNum string) (err error) {
 }
 
 func (repo *InMemRepo) Delete(contactId uuid.UUID) (err error) {
-	_, ok := repo.contactsMap[contactId]
-	if !ok {
-		return errors.New("Contact Not found")
-	}
 	delete(repo.contactsMap, contactId)
 	return nil
 }
@@ -125,7 +121,7 @@ func (repo *InMemRepo) FindById(contactId uuid.UUID) (contact *models.Contact, e
 	if !ok {
 		return nil, errors.New("Contact Not found")
 	}
-	return
+	return contact, nil
 }
 
 func (repo *InMemRepo) FindByName(name string) (contact *models.Contact, err error) {

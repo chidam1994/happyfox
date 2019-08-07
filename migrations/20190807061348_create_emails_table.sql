@@ -1,7 +1,7 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE emails (
-    contact_id UUID NOT NULL,
+    contact_id UUID NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
     email_id VARCHAR,
     tag VARCHAR,
     created_at TIMESTAMP NOT NULL,

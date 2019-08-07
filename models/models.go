@@ -46,7 +46,7 @@ type PhNum struct {
 }
 
 type Contact struct {
-	Id        uuid.UUID `db:"id"`
+	Id        uuid.UUID `db:"id, primarykey"`
 	Name      string    `db:"name"`
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`

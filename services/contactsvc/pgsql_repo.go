@@ -7,7 +7,6 @@ import (
 	"github.com/chidam1994/happyfox/models"
 	"github.com/chidam1994/happyfox/utils"
 	"github.com/google/uuid"
-	"github.com/pkg/errors"
 	"gopkg.in/gorp.v2"
 )
 
@@ -70,7 +69,11 @@ func (repo *PgsqlRepo) RemPhNum(contactId uuid.UUID, phNum string) error {
 }
 
 func (repo *PgsqlRepo) Delete(contactId uuid.UUID) error {
-	panic("not implemented")
+	_, err := repo.DbMap.Delete(&models.Contact{Id: contactId})
+	if err != nil {
+		return utils.GetAppError(err, "error while deleting contact", http.StatusInternalServerError)
+	}
+	return nil
 }
 
 func (repo *PgsqlRepo) Find(filterMap map[string]string) ([]*models.Contact, error) {
@@ -78,18 +81,22 @@ func (repo *PgsqlRepo) Find(filterMap map[string]string) ([]*models.Contact, err
 }
 
 func (repo *PgsqlRepo) FindById(contactId uuid.UUID) (*models.Contact, error) {
-	panic("not implemented")
+	result := models.Contact{}
+	err := repo.DbMap.SelectOne(&result, "select * from contacts where id= $1", contactId)
+	if err != nil && err != sql.ErrNoRows {
+		return nil, utils.GetAppError(err, "error while finding contact by Id", http.StatusInternalServerError)
+	}
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	return &result, nil
 }
 
 func (repo *PgsqlRepo) FindByName(name string) (*models.Contact, error) {
 	result := models.Contact{}
 	err := repo.DbMap.SelectOne(&result, "select * from contacts where name= $1", name)
 	if err != nil && err != sql.ErrNoRows {
-		appError := &utils.AppError{
-			Code: http.StatusInternalServerError,
-			Err:  errors.Wrap(err, "error while finding contact by name"),
-		}
-		return nil, appError
+		return nil, utils.GetAppError(err, "error while finding contact by name", http.StatusInternalServerError)
 	}
 	if err == sql.ErrNoRows {
 		return nil, nil
