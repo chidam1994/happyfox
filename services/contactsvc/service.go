@@ -2,6 +2,7 @@ package contactsvc
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/chidam1994/happyfox/models"
 	"github.com/chidam1994/happyfox/utils"
@@ -21,8 +22,13 @@ func NewService(r Repository) *Service {
 
 func (svc *Service) SaveContact(contact *models.Contact) (contactId uuid.UUID, err error) {
 	contact.Id = uuid.New()
-	_, err = svc.repo.FindByName(contact.Name)
-	if err == nil {
+	contact.CreatedAt = time.Now()
+	contact.UpdatedAt = time.Now()
+	existingContact, err := svc.repo.FindByName(contact.Name)
+	if err != nil {
+		return
+	}
+	if existingContact != nil {
 		appError := &utils.AppError{
 			Code: http.StatusConflict,
 			Err:  errors.Wrap(errors.New("Contact with the specified Name already exists"), "Unable to create contact"),

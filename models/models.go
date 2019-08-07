@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -27,10 +29,12 @@ type PhNum struct {
 }
 
 type Contact struct {
-	Id     uuid.UUID
-	Name   string
-	Emails []*Email
-	PhNums []*PhNum
+	Id        uuid.UUID `db:"id"`
+	Name      string    `db:"name"`
+	CreatedAt time.Time `db:"created_at"`
+	UpdatedAt time.Time `db:"updated_at"`
+	Emails    []*Email  `db:"-"`
+	PhNums    []*PhNum  `db:"-"`
 }
 
 type Group struct {

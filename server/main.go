@@ -7,13 +7,17 @@ import (
 	"time"
 
 	"github.com/chidam1994/happyfox/config"
+	"github.com/chidam1994/happyfox/datastore/gorp"
 	"github.com/chidam1994/happyfox/server/handlers"
+	"github.com/chidam1994/happyfox/services/contactsvc"
 	"github.com/gorilla/mux"
 )
 
 func main() {
 	r := mux.NewRouter()
 
+	_ = contactsvc.NewService(contactsvc.NewPgsqlRepo(gorp.InitDB()))
+	defer gorp.CloseDBConn()
 	contactRouter := r.PathPrefix("/contact").Subrouter()
 	handlers.InitContactHandlers(contactRouter)
 
@@ -26,7 +30,7 @@ func main() {
 	srv := &http.Server{
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
-		Addr:         config.GetString("port"),
+		Addr:         config.GetString(config.PORT),
 		ErrorLog:     logger,
 	}
 	err := srv.ListenAndServe()

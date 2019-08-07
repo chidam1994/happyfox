@@ -9,7 +9,6 @@ import (
 type configKey string
 
 var config *viper.Viper
-var configKeyMap map[string]configKey
 
 func init() {
 	config = viper.New()
@@ -19,23 +18,17 @@ func init() {
 	if err != nil {
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
-	configKeyMap = map[string]configKey{
-		"port": PORT,
-	}
 }
 
-func GetString(key string) string {
-	return config.GetString(key)
+func GetString(key configKey) string {
+	return config.GetString(string(key))
 }
 
 const (
-	PORT configKey = "port"
+	PORT        configKey = "port"
+	DB_HOST     configKey = "database.host"
+	DB_USERNAME configKey = "database.username"
+	DB_PASSWORD configKey = "database.password"
+	DB_DBNAME   configKey = "database.dbname"
+	DB_PORT     configKey = "database.port"
 )
-
-func StrToConfigKey(key string) configKey {
-	configKey, ok := configKeyMap[key]
-	if !ok {
-		panic(fmt.Errorf("config key %s not found\n", key))
-	}
-	return configKey
-}
