@@ -10,16 +10,20 @@ import (
 	"github.com/chidam1994/happyfox/datastore/gorp"
 	"github.com/chidam1994/happyfox/server/handlers"
 	"github.com/chidam1994/happyfox/services/contactsvc"
+	"github.com/chidam1994/happyfox/services/groupsvc"
 	"github.com/gorilla/mux"
 )
 
 func main() {
 	r := mux.NewRouter()
-
-	contactService := contactsvc.NewService(contactsvc.NewPgsqlRepo(gorp.InitDB()))
+	dbMap := gorp.InitDB()
+	contactService := contactsvc.NewService(contactsvc.NewPgsqlRepo(dbMap))
+	groupService := groupsvc.NewService(groupsvc.NewPgsqlRepo(dbMap))
 	defer gorp.CloseDBConn()
 	contactRouter := r.PathPrefix("/contact").Subrouter()
+	groupRouter := r.PathPrefix("/group").Subrouter()
 	handlers.InitContactHandlers(contactRouter, contactService)
+	handlers.InitGroupHandlers(groupRouter, groupService)
 
 	http.Handle("/", r)
 	r.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
