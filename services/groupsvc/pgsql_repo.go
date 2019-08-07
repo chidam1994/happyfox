@@ -61,7 +61,11 @@ func (repo *PgsqlRepo) RenameGroup(groupId uuid.UUID, name string) error {
 }
 
 func (repo *PgsqlRepo) Delete(groupId uuid.UUID) error {
-	panic("not implemented")
+	_, err := repo.DbMap.Delete(&models.Group{Id: groupId})
+	if err != nil {
+		return utils.GetAppError(err, "error while deleting group", http.StatusInternalServerError)
+	}
+	return nil
 }
 
 func (repo *PgsqlRepo) FindByName(name string) (*models.Group, error) {
@@ -77,5 +81,13 @@ func (repo *PgsqlRepo) FindByName(name string) (*models.Group, error) {
 }
 
 func (repo *PgsqlRepo) FindById(groupId uuid.UUID) (*models.Group, error) {
-	panic("not implemented")
+	result := models.Group{}
+	err := repo.DbMap.SelectOne(&result, "select * from groups where id= $1", groupId)
+	if err != nil && err != sql.ErrNoRows {
+		return nil, utils.GetAppError(err, "error while finding group by Id", http.StatusInternalServerError)
+	}
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	return &result, nil
 }

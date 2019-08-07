@@ -40,7 +40,8 @@ func (repo *InMemRepo) RenameGroup(groupId uuid.UUID, name string) error {
 }
 
 func (repo *InMemRepo) Delete(groupId uuid.UUID) error {
-	panic("not implemented")
+	delete(repo.groupsMap, groupId)
+	return nil
 }
 
 func (repo *InMemRepo) FindByName(name string) (*models.Group, error) {

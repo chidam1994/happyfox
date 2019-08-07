@@ -35,6 +35,17 @@ func (svc *Service) SaveGroup(group *models.Group) (groupId uuid.UUID, err error
 	return svc.repo.Save(group)
 }
 
+func (svc *Service) DeleteGroup(groupId uuid.UUID) error {
+	group, err := svc.repo.FindById(groupId)
+	if err != nil {
+		return err
+	}
+	if group == nil {
+		return utils.GetAppError(errors.New("The group you're trying to delete doesnt exist"), "Unable to Delete group", http.StatusConflict)
+	}
+	return svc.repo.Delete(groupId)
+}
+
 func beforeSave(group *models.Group, groupId uuid.UUID) {
 	now := time.Now()
 	for i := range group.Members {
