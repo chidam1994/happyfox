@@ -1,4 +1,4 @@
-package contactsvc
+package repository
 
 import (
 	"database/sql"
@@ -78,7 +78,7 @@ func (repo *PgsqlRepo) Delete(contactId uuid.UUID) error {
 	return nil
 }
 
-func (repo *PgsqlRepo) Find(filterMap map[Filter]string) ([]models.Contact, error) {
+func (repo *PgsqlRepo) Find(filterMap map[models.Filter]string) ([]models.Contact, error) {
 	results := []models.Contact{}
 	var query string
 	if len(filterMap) > 0 {
@@ -137,18 +137,18 @@ func (repo *PgsqlRepo) FindPhNum(contactId uuid.UUID, phNum string) (*models.PhN
 	panic("not implemented")
 }
 
-func GetSearchCondition(filtersMap map[Filter]string) string {
+func GetSearchCondition(filtersMap map[models.Filter]string) string {
 	result := ""
-	if value, ok := filtersMap[NameFilter]; ok {
+	if value, ok := filtersMap[models.NameFilter]; ok {
 		result = result + fmt.Sprintf("contacts.name like '%%%s%%' ", value)
 	}
-	if value, ok := filtersMap[EmailFilter]; ok {
+	if value, ok := filtersMap[models.EmailFilter]; ok {
 		if len(result) > 0 {
 			result = result + "or "
 		}
 		result = result + fmt.Sprintf("emails.email_id like '%%%s%%' ", value)
 	}
-	if value, ok := filtersMap[PhoneFilter]; ok {
+	if value, ok := filtersMap[models.PhoneFilter]; ok {
 		if len(result) > 0 {
 			result = result + "or "
 		}

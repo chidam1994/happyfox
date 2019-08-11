@@ -1,4 +1,4 @@
-package contactsvc
+package repository
 
 import (
 	"strings"
@@ -74,15 +74,15 @@ func (repo *InMemRepo) Delete(contactId uuid.UUID) (err error) {
 	return nil
 }
 
-func (repo *InMemRepo) Find(filterMap map[Filter]string) (results []models.Contact, err error) {
+func (repo *InMemRepo) Find(filterMap map[models.Filter]string) (results []models.Contact, err error) {
 	for _, contact := range repo.contactsMap {
-		if filterValue, ok := filterMap[NameFilter]; ok {
+		if filterValue, ok := filterMap[models.NameFilter]; ok {
 			if strings.Contains(strings.ToLower(contact.Name), strings.ToLower(filterValue)) {
 				results = append(results, *contact)
 				continue
 			}
 		}
-		if filterValue, ok := filterMap[EmailFilter]; ok {
+		if filterValue, ok := filterMap[models.EmailFilter]; ok {
 			emailMatch := false
 			for _, email := range contact.Emails {
 				if strings.Contains(strings.ToLower(email.Id), strings.ToLower(filterValue)) {
@@ -95,7 +95,7 @@ func (repo *InMemRepo) Find(filterMap map[Filter]string) (results []models.Conta
 				continue
 			}
 		}
-		if filterValue, ok := filterMap[PhoneFilter]; ok {
+		if filterValue, ok := filterMap[models.PhoneFilter]; ok {
 			phNumMatch := false
 			for _, phNum := range contact.PhNums {
 				if strings.Contains(strings.ToLower(phNum.Number), strings.ToLower(filterValue)) {

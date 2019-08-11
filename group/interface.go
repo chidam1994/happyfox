@@ -1,4 +1,4 @@
-package groupsvc
+package group
 
 import (
 	"github.com/chidam1994/happyfox/models"
@@ -14,4 +14,10 @@ type Repository interface {
 	Delete(groupId uuid.UUID) error
 	FindByName(name string) (*models.Group, error)
 	FindById(groupId uuid.UUID) (*models.Group, error)
+}
+
+type Service interface {
+	SaveGroup(group *models.Group) (uuid.UUID, error)
+	DeleteGroup(groupId uuid.UUID) error
+	GetGroup(groupId uuid.UUID) (*models.Group, error)
 }

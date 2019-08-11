@@ -1,4 +1,4 @@
-package groupsvc
+package repository
 
 import (
 	"errors"

@@ -1,26 +1,27 @@
-package groupsvc
+package service
 
 import (
 	"errors"
 	"net/http"
 	"time"
 
+	"github.com/chidam1994/happyfox/group"
 	"github.com/chidam1994/happyfox/models"
 	"github.com/chidam1994/happyfox/utils"
 	"github.com/google/uuid"
 )
 
-type Service struct {
-	repo Repository
+type groupService struct {
+	repo group.Repository
 }
 
-func NewService(r Repository) *Service {
-	return &Service{
+func NewService(r group.Repository) group.Service {
+	return &groupService{
 		repo: r,
 	}
 }
 
-func (svc *Service) SaveGroup(group *models.Group) (groupId uuid.UUID, err error) {
+func (svc *groupService) SaveGroup(group *models.Group) (groupId uuid.UUID, err error) {
 	group.Id = uuid.New()
 	group.CreatedAt = time.Now()
 	group.UpdatedAt = time.Now()
@@ -35,7 +36,7 @@ func (svc *Service) SaveGroup(group *models.Group) (groupId uuid.UUID, err error
 	return svc.repo.Save(group)
 }
 
-func (svc *Service) DeleteGroup(groupId uuid.UUID) error {
+func (svc *groupService) DeleteGroup(groupId uuid.UUID) error {
 	group, err := svc.repo.FindById(groupId)
 	if err != nil {
 		return err
@@ -46,7 +47,7 @@ func (svc *Service) DeleteGroup(groupId uuid.UUID) error {
 	return svc.repo.Delete(groupId)
 }
 
-func (svc *Service) GetGroup(groupId uuid.UUID) (*models.Group, error) {
+func (svc *groupService) GetGroup(groupId uuid.UUID) (*models.Group, error) {
 	return svc.repo.FindById(groupId)
 }
 

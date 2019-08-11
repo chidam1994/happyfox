@@ -1,4 +1,4 @@
-package contactsvc
+package service
 
 import (
 	"testing"

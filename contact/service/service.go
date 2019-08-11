@@ -1,48 +1,27 @@
-package contactsvc
+package service
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
+	"github.com/chidam1994/happyfox/contact"
 	"github.com/chidam1994/happyfox/models"
 	"github.com/chidam1994/happyfox/utils"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )
 
-type Service struct {
-	repo Repository
+type contactService struct {
+	repo contact.Repository
 }
 
-func NewService(r Repository) *Service {
-	return &Service{
+func NewService(r contact.Repository) contact.Service {
+	return &contactService{
 		repo: r,
 	}
 }
 
-type Filter string
-
-const (
-	NameFilter  Filter = "name"
-	EmailFilter Filter = "email"
-	PhoneFilter Filter = "phnum"
-)
-
-func GetFilter(filterStr string) (Filter, error) {
-	filterMap := map[string]Filter{
-		"name":  NameFilter,
-		"email": EmailFilter,
-		"phnum": PhoneFilter,
-	}
-	filter, ok := filterMap[filterStr]
-	if !ok {
-		return Filter(""), fmt.Errorf("error converting string %s to filter", filterStr)
-	}
-	return filter, nil
-}
-
-func (svc *Service) SaveContact(contact *models.Contact) (contactId uuid.UUID, err error) {
+func (svc *contactService) SaveContact(contact *models.Contact) (contactId uuid.UUID, err error) {
 	contact.Id = uuid.New()
 	contact.CreatedAt = time.Now()
 	contact.UpdatedAt = time.Now()
@@ -57,15 +36,15 @@ func (svc *Service) SaveContact(contact *models.Contact) (contactId uuid.UUID, e
 	return svc.repo.Save(contact)
 }
 
-func (svc *Service) FindContacts(filterMap map[Filter]string) ([]models.Contact, error) {
+func (svc *contactService) FindContacts(filterMap map[models.Filter]string) ([]models.Contact, error) {
 	return svc.repo.Find(filterMap)
 }
 
-func (svc *Service) GetContact(contactId uuid.UUID) (*models.Contact, error) {
+func (svc *contactService) GetContact(contactId uuid.UUID) (*models.Contact, error) {
 	return svc.repo.FindById(contactId)
 }
 
-func (svc *Service) DeleteContact(contactId uuid.UUID) error {
+func (svc *contactService) DeleteContact(contactId uuid.UUID) error {
 	contact, err := svc.repo.FindById(contactId)
 	if err != nil {
 		return err

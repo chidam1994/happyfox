@@ -7,23 +7,26 @@ import (
 	"time"
 
 	"github.com/chidam1994/happyfox/config"
+	_contactRepo "github.com/chidam1994/happyfox/contact/repository"
+	_contactService "github.com/chidam1994/happyfox/contact/service"
+	_contactTransport "github.com/chidam1994/happyfox/contact/transport"
 	"github.com/chidam1994/happyfox/datastore/gorp"
-	"github.com/chidam1994/happyfox/server/handlers"
-	"github.com/chidam1994/happyfox/services/contactsvc"
-	"github.com/chidam1994/happyfox/services/groupsvc"
+	_groupRepo "github.com/chidam1994/happyfox/group/repository"
+	_groupService "github.com/chidam1994/happyfox/group/service"
+	_groupTransport "github.com/chidam1994/happyfox/group/transport"
 	"github.com/gorilla/mux"
 )
 
 func main() {
 	r := mux.NewRouter()
 	dbMap := gorp.InitDB()
-	contactService := contactsvc.NewService(contactsvc.NewPgsqlRepo(dbMap))
-	groupService := groupsvc.NewService(groupsvc.NewPgsqlRepo(dbMap))
+	contactService := _contactService.NewService(_contactRepo.NewPgsqlRepo(dbMap))
+	groupService := _groupService.NewService(_groupRepo.NewPgsqlRepo(dbMap))
 	defer gorp.CloseDBConn()
 	contactRouter := r.PathPrefix("/contact").Subrouter()
 	groupRouter := r.PathPrefix("/group").Subrouter()
-	handlers.InitContactHandlers(contactRouter, contactService)
-	handlers.InitGroupHandlers(groupRouter, groupService)
+	_contactTransport.InitContactHandlers(contactRouter, contactService)
+	_groupTransport.InitGroupHandlers(groupRouter, groupService)
 
 	http.Handle("/", r)
 	r.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {

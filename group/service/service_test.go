@@ -1,4 +1,4 @@
-package groupsvc
+package service
 
 import (
 	"testing"
