@@ -3,13 +3,14 @@ package service
 import (
 	"testing"
 
+	"github.com/chidam1994/happyfox/contact/repository"
 	"github.com/chidam1994/happyfox/models"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSave(t *testing.T) {
-	repo := NewInMemRepo()
+	repo := repository.NewInMemRepo()
 	svc := NewService(repo)
 	contact := &models.Contact{
 		Name:   "testContact",
@@ -26,7 +27,7 @@ func TestSave(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	repo := NewInMemRepo()
+	repo := repository.NewInMemRepo()
 	svc := NewService(repo)
 	workTag, err := models.GetTag("work")
 	assert.Nil(t, err)
@@ -48,7 +49,7 @@ func TestDelete(t *testing.T) {
 }
 
 func TestFind(t *testing.T) {
-	repo := NewInMemRepo()
+	repo := repository.NewInMemRepo()
 	svc := NewService(repo)
 	workTag, err := models.GetTag("work")
 	assert.Nil(t, err)
@@ -71,9 +72,9 @@ func TestFind(t *testing.T) {
 	assert.Nil(t, err)
 	_, err = svc.SaveContact(contact2)
 	assert.Nil(t, err)
-	filterMap := map[Filter]string{
-		NameFilter:  "one",
-		PhoneFilter: "677",
+	filterMap := map[models.Filter]string{
+		models.NameFilter:  "one",
+		models.PhoneFilter: "677",
 	}
 	results, err := svc.FindContacts(filterMap)
 	assert.Nil(t, err)

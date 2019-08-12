@@ -1,0 +1,58 @@
+[
+  {
+    "name": "ffsfwefsedgd",
+    "emails": [
+      {
+        "email_id": "a@b",
+        "tag": "personal"
+      },
+      {
+        "email_id": "ef@gh.cd",
+        "tag": "work"
+      }
+    ],
+    "phnums": [
+      {
+        "number": "9842422266",
+        "tag": "wwefrk"
+      }
+    ]
+  },
+  {
+    "name": "ffsfwefsedgd",
+    "emails": [
+      {
+        "email_id": "ab",
+        "tag": "personal"
+      },
+      {
+        "email_id": "ef@gh.cd",
+        "tag": "work"
+      }
+    ],
+    "phnums": [
+      {
+        "number": "9842422266",
+        "tag": "work"
+      }
+    ]
+  },
+  {
+    "emails": [
+      {
+        "email_id": "a@b",
+        "tag": "personal"
+      },
+      {
+        "email_id": "ef@gh.cd",
+        "tag": "work"
+      }
+    ],
+    "phnums": [
+      {
+        "number": "9842422266",
+        "tag": "work"
+      }
+    ]
+  }
+]

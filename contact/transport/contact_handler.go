@@ -19,7 +19,7 @@ func (handler *contactHandler) createContact(w http.ResponseWriter, r *http.Requ
 	var body *CreateContactRequest
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
-		w = utils.GetBadReqResponse(w, "error decoding json body")
+		w = utils.GetBadReqResponse(w, err.Error())
 		return
 	}
 	contact, err := body.Validate()

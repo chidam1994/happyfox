@@ -1,0 +1,19 @@
+{
+    "name": "ffsfedgd",
+    "emails": [
+        {
+            "email_id": "a@b",
+            "tag": "personal"
+        },
+        {
+            "email_id": "ef@gh.cd",
+            "tag": "work"
+        }
+    ],
+    "phnums": [
+        {
+            "number": "9842422266",
+            "tag": "work"
+        }
+    ]
+}

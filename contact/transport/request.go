@@ -61,12 +61,12 @@ func (request *CreateContactRequest) Validate() (*models.Contact, error) {
 		if !rxPhNum.Match([]byte(request.PhNums[i].Number)) {
 			return nil, fmt.Errorf("the number %s is not valid", request.PhNums[i].Number)
 		}
-		tag, err := models.GetTag(request.Emails[i].Tag)
+		tag, err := models.GetTag(request.PhNums[i].Tag)
 		if err != nil {
 			return nil, errors.New("email tag can only either of \"work\" or \"personal\" values")
 		}
 		phNum := &models.PhNum{
-			Number: request.Emails[i].Id,
+			Number: request.PhNums[i].Number,
 			Tag:    tag,
 		}
 		result.PhNums = append(result.PhNums, phNum)

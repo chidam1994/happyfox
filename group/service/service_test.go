@@ -3,13 +3,14 @@ package service
 import (
 	"testing"
 
+	"github.com/chidam1994/happyfox/group/repository"
 	"github.com/chidam1994/happyfox/models"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSave(t *testing.T) {
-	repo := NewInMemRepo()
+	repo := repository.NewInMemRepo()
 	svc := NewService(repo)
 	group := &models.Group{
 		Name:    "testGroup",
@@ -25,7 +26,7 @@ func TestSave(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	repo := NewInMemRepo()
+	repo := repository.NewInMemRepo()
 	svc := NewService(repo)
 	group := &models.Group{
 		Name:    "testGroup",

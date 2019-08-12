@@ -20,7 +20,7 @@ Read contact-
 	    ],
 	    "phnums": [
 		{
-		    "phnum": "a@b",
+		    "number": "8877665544",
 		    "tag": 1
 		}
 	    ]

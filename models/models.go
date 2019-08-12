@@ -2,32 +2,37 @@ package models
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/google/uuid"
 )
 
-type Tag int
+type Tag string
 
 const (
-	Work Tag = iota
-	Personal
+	Work     Tag = "work"
+	Personal Tag = "personal"
 )
 
 func (tag Tag) String() string {
-	tags := [...]string{"Work", "Personal"}
+	tags := map[Tag]string{
+		Work:     "work",
+		Personal: "personal",
+	}
 	return tags[tag]
 }
 
 func GetTag(tagstr string) (Tag, error) {
-	tags := [...]string{"Work", "Personal"}
-	for i := range tags {
-		if strings.ToLower(tags[i]) == strings.ToLower(tagstr) {
-			return Tag(i), nil
-		}
+	tags := map[string]Tag{
+		"work":     Work,
+		"personal": Personal,
 	}
-	return Tag(0), fmt.Errorf("error converting string: %s to Tag", tagstr)
+	tag, ok := tags[tagstr]
+	if !ok {
+		return Tag(""), fmt.Errorf("error converting string: %s to Tag", tagstr)
+
+	}
+	return tag, nil
 }
 
 type Email struct {
