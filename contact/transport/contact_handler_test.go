@@ -173,3 +173,15 @@ func TestSearchContact(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(respBody))
 }
+func TestSearchContactError(t *testing.T) {
+	svc := &mockContactService{}
+	handler := &contactHandler{
+		contactSvc: svc,
+	}
+	httphandler := http.HandlerFunc(handler.searchContact)
+	req, err := http.NewRequest("GET", "/contact/search?name=test&phnum=999&eil=abc", nil)
+	assert.NoError(t, err)
+	rr := httptest.NewRecorder()
+	httphandler.ServeHTTP(rr, req)
+	assert.Equal(t, http.StatusBadRequest, rr.Code)
+}
