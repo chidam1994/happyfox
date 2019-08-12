@@ -10,6 +10,7 @@ import (
 
 	"github.com/chidam1994/happyfox/models"
 	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -55,7 +56,7 @@ func (mockSvc *mockContactService) GetContact(contactId uuid.UUID) (*models.Cont
 	return contact, nil
 }
 
-func TestSaveContact(t *testing.T) {
+func TestCreateContact(t *testing.T) {
 	data, err := ioutil.ReadFile("./fixtures/create_contact_req.json")
 	assert.NoError(t, err)
 	var contact *CreateContactRequest
@@ -78,7 +79,7 @@ func TestSaveContact(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestSaveContactErrors(t *testing.T) {
+func TestCreateContactErrors(t *testing.T) {
 	data, err := ioutil.ReadFile("./fixtures/create_contact_req_errors.json")
 	assert.NoError(t, err)
 	var contacts []*CreateContactRequest
@@ -98,4 +99,34 @@ func TestSaveContactErrors(t *testing.T) {
 		httphandler.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
 	}
+}
+
+func TestDeleteContact(t *testing.T) {
+	contactId := uuid.New().String()
+	svc := &mockContactService{}
+	handler := &contactHandler{
+		contactSvc: svc,
+	}
+	httphandler := http.HandlerFunc(handler.deleteContact)
+	req, err := http.NewRequest("DELETE", "/contact/"+contactId, nil)
+	assert.NoError(t, err)
+	req = mux.SetURLVars(req, map[string]string{"id": contactId})
+	rr := httptest.NewRecorder()
+	httphandler.ServeHTTP(rr, req)
+	assert.Equal(t, http.StatusOK, rr.Code)
+}
+
+func TestDeleteContactError(t *testing.T) {
+	contactId := "invalidId"
+	svc := &mockContactService{}
+	handler := &contactHandler{
+		contactSvc: svc,
+	}
+	httphandler := http.HandlerFunc(handler.deleteContact)
+	req, err := http.NewRequest("DELETE", "/contact/"+contactId, nil)
+	assert.NoError(t, err)
+	req = mux.SetURLVars(req, map[string]string{"id": contactId})
+	rr := httptest.NewRecorder()
+	httphandler.ServeHTTP(rr, req)
+	assert.Equal(t, http.StatusBadRequest, rr.Code)
 }
