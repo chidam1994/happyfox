@@ -23,16 +23,36 @@ func (repo *InMemRepo) Save(group *models.Group) (uuid.UUID, error) {
 
 }
 
-func (repo *InMemRepo) AddMembers(memberIds []uuid.UUID) error {
-	panic("not implemented")
+func (repo *InMemRepo) AddMembers(groupId uuid.UUID, members []*models.Member) error {
+	group := repo.groupsMap[groupId]
+	group.Members = append(group.Members, members...)
+	return nil
 }
 
-func (repo *InMemRepo) RemMembers(memberIds []uuid.UUID) error {
-	panic("not implemented")
+func (repo *InMemRepo) RemMembers(groupId uuid.UUID, memberIds []uuid.UUID) error {
+	group := repo.groupsMap[groupId]
+	for _, memId := range memberIds {
+		for i := range group.Members {
+			if group.Members[i].MemberId == memId {
+				group.Members = append(group.Members[:i], group.Members[i+1:]...)
+				break
+			}
+		}
+	}
+	return nil
 }
 
-func (repo *InMemRepo) GetMembersCount(memberIds []uuid.UUID) (int, error) {
-	panic("not implemented")
+func (repo *InMemRepo) GetMembersCount(groupId uuid.UUID, memberIds []uuid.UUID) (int, error) {
+	count := 0
+	for _, id := range memberIds {
+		for _, member := range repo.groupsMap[groupId].Members {
+			if id == member.MemberId {
+				count += 1
+				continue
+			}
+		}
+	}
+	return count, nil
 }
 
 func (repo *InMemRepo) RenameGroup(groupId uuid.UUID, name string) error {

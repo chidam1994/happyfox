@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 
 	"github.com/chidam1994/happyfox/models"
@@ -44,16 +45,48 @@ func (repo *PgsqlRepo) Save(group *models.Group) (groupId uuid.UUID, err error) 
 	return group.Id, nil
 }
 
-func (repo *PgsqlRepo) AddMembers(memberIds []uuid.UUID) error {
-	panic("not implemented")
+func (repo *PgsqlRepo) AddMembers(groupId uuid.UUID, members []*models.Member) error {
+	temp := make([]interface{}, len(members))
+	for i, val := range members {
+		temp[i] = val
+	}
+	err := repo.DbMap.Insert(temp...)
+	if err != nil {
+		return utils.GetAppError(err, "error while adding members", http.StatusInternalServerError)
+	}
+	return nil
 }
 
-func (repo *PgsqlRepo) RemMembers(memberIds []uuid.UUID) error {
-	panic("not implemented")
+func (repo *PgsqlRepo) RemMembers(groupId uuid.UUID, memberIds []uuid.UUID) error {
+	var memIds string
+	for i, id := range memberIds {
+		if i > 0 {
+			memIds += ", "
+		}
+		memIds += "'" + id.String() + "'"
+	}
+	query := fmt.Sprintf("delete from members where group_id = '%s' and member_id in (%s)", groupId.String(), memIds)
+	_, err := repo.DbMap.Exec(query)
+	if err != nil {
+		return utils.GetAppError(err, "error while removing group members", http.StatusInternalServerError)
+	}
+	return nil
 }
 
-func (repo *PgsqlRepo) GetMembersCount(memberIds []uuid.UUID) (int, error) {
-	panic("not implemented")
+func (repo *PgsqlRepo) GetMembersCount(groupId uuid.UUID, memberIds []uuid.UUID) (int, error) {
+	var memIds string
+	for i, id := range memberIds {
+		if i > 0 {
+			memIds += ", "
+		}
+		memIds += "'" + id.String() + "'"
+	}
+	query := fmt.Sprintf("select count(*) from members where group_id = '%s' and member_id in (%s)", groupId.String(), memIds)
+	count, err := repo.DbMap.SelectInt(query)
+	if err != nil {
+		return 0, utils.GetAppError(err, "error while getting member count", http.StatusInternalServerError)
+	}
+	return int(count), nil
 }
 
 func (repo *PgsqlRepo) RenameGroup(groupId uuid.UUID, name string) error {

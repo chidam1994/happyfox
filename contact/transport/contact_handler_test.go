@@ -2,7 +2,6 @@ package transport
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -93,7 +92,6 @@ func TestSaveContactErrors(t *testing.T) {
 	for _, contact := range contacts {
 		contactByteArr, err := json.Marshal(contact)
 		assert.NoError(t, err)
-		fmt.Println(string(contactByteArr))
 		req, err := http.NewRequest("POST", "/contact", strings.NewReader(string(contactByteArr)))
 		assert.NoError(t, err)
 		rr := httptest.NewRecorder()

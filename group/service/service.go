@@ -42,13 +42,49 @@ func (svc *groupService) DeleteGroup(groupId uuid.UUID) error {
 		return err
 	}
 	if group == nil {
-		return utils.GetAppError(errors.New("The group you're trying to delete doesnt exist"), "Unable to Delete group", http.StatusConflict)
+		return utils.GetAppError(errors.New("The group you're trying to delete doesnt exist"), "Unable to Delete group", http.StatusBadRequest)
 	}
 	return svc.repo.Delete(groupId)
 }
 
 func (svc *groupService) GetGroup(groupId uuid.UUID) (*models.Group, error) {
 	return svc.repo.FindById(groupId)
+}
+
+func (svc *groupService) AddMembers(groupId uuid.UUID, memberIds []uuid.UUID) error {
+	group, err := svc.repo.FindById(groupId)
+	if err != nil {
+		return err
+	}
+	if group == nil {
+		return utils.GetAppError(errors.New("The group you're trying to add members to doesnt exist"), "Unable to add members", http.StatusBadRequest)
+	}
+	num, err := svc.repo.GetMembersCount(groupId, memberIds)
+	if err != nil {
+		return err
+	}
+	if num > 0 {
+		return utils.GetAppError(errors.New("some of the contacts you are trying to add are already members of the group"), "Unable to Add members", http.StatusBadRequest)
+	}
+	return svc.repo.AddMembers(groupId, getMembers(memberIds, groupId))
+}
+
+func (svc *groupService) RemMembers(groupId uuid.UUID, memberIds []uuid.UUID) error {
+	group, err := svc.repo.FindById(groupId)
+	if err != nil {
+		return err
+	}
+	if group == nil {
+		return utils.GetAppError(errors.New("The group you're trying to add members to doesnt exist"), "Unable to add members", http.StatusBadRequest)
+	}
+	num, err := svc.repo.GetMembersCount(groupId, memberIds)
+	if err != nil {
+		return err
+	}
+	if num < len(memberIds) {
+		return utils.GetAppError(errors.New("some of the contacts you are trying to remove are not members of the group"), "Unable to remove members", http.StatusBadRequest)
+	}
+	return svc.repo.RemMembers(groupId, memberIds)
 }
 
 func beforeSave(group *models.Group, groupId uuid.UUID) {
@@ -58,4 +94,18 @@ func beforeSave(group *models.Group, groupId uuid.UUID) {
 		group.Members[i].CreatedAt = now
 		group.Members[i].UpdatedAt = now
 	}
+}
+
+func getMembers(memberIds []uuid.UUID, groupId uuid.UUID) []*models.Member {
+	now := time.Now()
+	result := make([]*models.Member, len(memberIds))
+	for i := range memberIds {
+		result[i] = &models.Member{
+			MemberId:  memberIds[i],
+			GroupId:   groupId,
+			CreatedAt: now,
+			UpdatedAt: now,
+		}
+	}
+	return result
 }
