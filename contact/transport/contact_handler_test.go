@@ -14,6 +14,25 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var mockContact1, mockContact2 *models.Contact
+
+func init() {
+	workTag, _ := models.GetTag("work")
+	personalTag, _ := models.GetTag("personal")
+	mockContact1 = &models.Contact{
+		Id:     uuid.New(),
+		Name:   "mockContact1",
+		Emails: []*models.Email{&models.Email{Id: "testemail@abc.com", Tag: workTag}},
+		PhNums: []*models.PhNum{&models.PhNum{Number: "9988776655", Tag: workTag}, &models.PhNum{Number: "5544332211", Tag: personalTag}},
+	}
+	mockContact2 = &models.Contact{
+		Id:     uuid.New(),
+		Name:   "mockContact2",
+		Emails: []*models.Email{&models.Email{Id: "testcont2@abc.com", Tag: workTag}},
+		PhNums: []*models.PhNum{&models.PhNum{Number: "6666666666", Tag: personalTag}, &models.PhNum{Number: "1199228833", Tag: personalTag}},
+	}
+}
+
 type mockContactService struct {
 }
 
@@ -22,21 +41,7 @@ func (mockSvc *mockContactService) SaveContact(contact *models.Contact) (uuid.UU
 }
 
 func (mockSvc *mockContactService) FindContacts(filterMap map[models.Filter]string) ([]models.Contact, error) {
-	workTag, _ := models.GetTag("work")
-	personalTag, _ := models.GetTag("personal")
-	contact1 := models.Contact{
-		Id:     uuid.New(),
-		Name:   "mockContact1",
-		Emails: []*models.Email{&models.Email{Id: "testemail@abc.com", Tag: workTag}},
-		PhNums: []*models.PhNum{&models.PhNum{Number: "9988776655", Tag: workTag}, &models.PhNum{Number: "5544332211", Tag: personalTag}},
-	}
-	contact2 := models.Contact{
-		Id:     uuid.New(),
-		Name:   "mockContact2",
-		Emails: []*models.Email{&models.Email{Id: "testcont2@abc.com", Tag: workTag}},
-		PhNums: []*models.PhNum{&models.PhNum{Number: "6666666666", Tag: personalTag}, &models.PhNum{Number: "1199228833", Tag: personalTag}},
-	}
-	return []models.Contact{contact1, contact2}, nil
+	return []models.Contact{*mockContact1, *mockContact2}, nil
 
 }
 
@@ -45,15 +50,7 @@ func (mockSvc *mockContactService) DeleteContact(contactId uuid.UUID) error {
 }
 
 func (mockSvc *mockContactService) GetContact(contactId uuid.UUID) (*models.Contact, error) {
-	workTag, _ := models.GetTag("work")
-	personalTag, _ := models.GetTag("personal")
-	contact := &models.Contact{
-		Id:     contactId,
-		Name:   "mockContact",
-		Emails: []*models.Email{&models.Email{Id: "testemail@abc.com", Tag: workTag}},
-		PhNums: []*models.PhNum{&models.PhNum{Number: "9988776655", Tag: workTag}, &models.PhNum{Number: "5544332211", Tag: personalTag}},
-	}
-	return contact, nil
+	return mockContact2, nil
 }
 
 func TestCreateContact(t *testing.T) {
@@ -129,4 +126,50 @@ func TestDeleteContactError(t *testing.T) {
 	rr := httptest.NewRecorder()
 	httphandler.ServeHTTP(rr, req)
 	assert.Equal(t, http.StatusBadRequest, rr.Code)
+}
+
+func TestGetContact(t *testing.T) {
+	contactId := uuid.New().String()
+	svc := &mockContactService{}
+	handler := &contactHandler{
+		contactSvc: svc,
+	}
+	httphandler := http.HandlerFunc(handler.deleteContact)
+	req, err := http.NewRequest("GET", "/contact/"+contactId, nil)
+	assert.NoError(t, err)
+	req = mux.SetURLVars(req, map[string]string{"id": contactId})
+	rr := httptest.NewRecorder()
+	httphandler.ServeHTTP(rr, req)
+	assert.Equal(t, http.StatusOK, rr.Code)
+}
+
+func TestGetContactError(t *testing.T) {
+	contactId := "invalidId"
+	svc := &mockContactService{}
+	handler := &contactHandler{
+		contactSvc: svc,
+	}
+	httphandler := http.HandlerFunc(handler.deleteContact)
+	req, err := http.NewRequest("GET", "/contact/"+contactId, nil)
+	assert.NoError(t, err)
+	req = mux.SetURLVars(req, map[string]string{"id": contactId})
+	rr := httptest.NewRecorder()
+	httphandler.ServeHTTP(rr, req)
+	assert.Equal(t, http.StatusBadRequest, rr.Code)
+}
+func TestSearchContact(t *testing.T) {
+	svc := &mockContactService{}
+	handler := &contactHandler{
+		contactSvc: svc,
+	}
+	httphandler := http.HandlerFunc(handler.searchContact)
+	req, err := http.NewRequest("GET", "/contact/search?name=test&phnum=999&email=abc", nil)
+	assert.NoError(t, err)
+	rr := httptest.NewRecorder()
+	httphandler.ServeHTTP(rr, req)
+	assert.Equal(t, http.StatusOK, rr.Code)
+	var respBody []*models.Contact
+	err = json.Unmarshal([]byte(rr.Body.String()), &respBody)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(respBody))
 }
