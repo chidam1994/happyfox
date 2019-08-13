@@ -54,22 +54,6 @@ func (repo *PgsqlRepo) Save(contact *models.Contact) (contactId uuid.UUID, err e
 	return contact.Id, nil
 }
 
-func (repo *PgsqlRepo) AddEmail(contactId uuid.UUID, email *models.Email) error {
-	panic("not implemented")
-}
-
-func (repo *PgsqlRepo) AddPhNum(contactId uuid.UUID, phNum *models.PhNum) error {
-	panic("not implemented")
-}
-
-func (repo *PgsqlRepo) RemEmail(contactId uuid.UUID, email string) error {
-	panic("not implemented")
-}
-
-func (repo *PgsqlRepo) RemPhNum(contactId uuid.UUID, phNum string) error {
-	panic("not implemented")
-}
-
 func (repo *PgsqlRepo) Delete(contactId uuid.UUID) error {
 	_, err := repo.DbMap.Delete(&models.Contact{Id: contactId})
 	if err != nil {
@@ -127,14 +111,6 @@ func (repo *PgsqlRepo) FindByName(name string) (*models.Contact, error) {
 		return nil, nil
 	}
 	return &result, nil
-}
-
-func (repo *PgsqlRepo) FindEmail(contactId uuid.UUID, email string) (*models.Email, error) {
-	panic("not implemented")
-}
-
-func (repo *PgsqlRepo) FindPhNum(contactId uuid.UUID, phNum string) (*models.PhNum, error) {
-	panic("not implemented")
 }
 
 func GetSearchCondition(filtersMap map[models.Filter]string) string {

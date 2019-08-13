@@ -10,7 +10,7 @@ type Repository interface {
 	AddMembers(groupId uuid.UUID, members []*models.Member) error
 	RemMembers(groupId uuid.UUID, memberIds []uuid.UUID) error
 	GetMembersCount(groupId uuid.UUID, memberIds []uuid.UUID) (int, error)
-	RenameGroup(groupId uuid.UUID, name string) error
+	RenameGroup(group *models.Group) error
 	Delete(groupId uuid.UUID) error
 	FindByName(name string) (*models.Group, error)
 	FindById(groupId uuid.UUID) (*models.Group, error)
@@ -22,4 +22,5 @@ type Service interface {
 	GetGroup(groupId uuid.UUID) (*models.Group, error)
 	AddMembers(groupId uuid.UUID, memberIds []uuid.UUID) error
 	RemMembers(groupId uuid.UUID, memberIds []uuid.UUID) error
+	RenameGroup(groupId uuid.UUID, name string) error
 }

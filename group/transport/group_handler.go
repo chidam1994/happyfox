@@ -73,6 +73,63 @@ func (handler *groupHandler) getGroup(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (handler *groupHandler) updateGroup(w http.ResponseWriter, r *http.Request) {
+	var body UpdateGroupRequest
+	err := json.NewDecoder(r.Body).Decode(&body)
+	if err != nil {
+		w = utils.GetBadReqResponse(w, err.Error())
+		return
+	}
+	vars := mux.Vars(r)
+	actionStr := vars["action"]
+	action, err := getUpdateAction(actionStr)
+	if err != nil {
+		w = utils.GetBadReqResponse(w, err.Error())
+		return
+	}
+	groupId, err := uuid.Parse(body.GroupId)
+	if err != nil {
+		w = utils.GetBadReqResponse(w, "invalid groupId in request")
+		return
+	}
+
+	switch action {
+	case addMembers:
+		memberIds, err := validateUuids(body.MemberIds)
+		if err != nil {
+			w = utils.GetBadReqResponse(w, err.Error())
+			return
+		}
+		err = handler.groupSvc.AddMembers(groupId, memberIds)
+		if err != nil {
+			w = utils.GetBadReqResponse(w, err.Error())
+			return
+		}
+	case remMembers:
+		memberIds, err := validateUuids(body.MemberIds)
+		if err != nil {
+			w = utils.GetBadReqResponse(w, err.Error())
+			return
+		}
+		err = handler.groupSvc.RemMembers(groupId, memberIds)
+		if err != nil {
+			w = utils.GetBadReqResponse(w, err.Error())
+			return
+		}
+	case renameGroup:
+		if body.Name == "" {
+			w = utils.GetBadReqResponse(w, "name cannot be empty in request")
+			return
+		}
+		err = handler.groupSvc.RenameGroup(groupId, body.Name)
+		if err != nil {
+			w = utils.GetBadReqResponse(w, err.Error())
+			return
+		}
+	}
+	w = utils.GetSuccessReqResponse(w)
+}
+
 func InitGroupHandlers(r *mux.Router, service group.Service) {
 	handler := &groupHandler{
 		groupSvc: service,
@@ -80,4 +137,5 @@ func InitGroupHandlers(r *mux.Router, service group.Service) {
 	r.HandleFunc("", handler.createGroup).Methods("POST", "OPTIONS")
 	r.HandleFunc("/{id}", handler.deleteGroup).Methods("DELETE", "OPTIONS")
 	r.HandleFunc("/{id}", handler.getGroup).Methods("GET", "OPTIONS")
+	r.HandleFunc("/{action}", handler.updateGroup).Methods("PUT", "OPTIONS")
 }

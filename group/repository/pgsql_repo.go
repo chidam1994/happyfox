@@ -89,8 +89,12 @@ func (repo *PgsqlRepo) GetMembersCount(groupId uuid.UUID, memberIds []uuid.UUID)
 	return int(count), nil
 }
 
-func (repo *PgsqlRepo) RenameGroup(groupId uuid.UUID, name string) error {
-	panic("not implemented")
+func (repo *PgsqlRepo) RenameGroup(group *models.Group) error {
+	_, err := repo.DbMap.Update(group)
+	if err != nil {
+		return utils.GetAppError(err, "error while renaming group", http.StatusInternalServerError)
+	}
+	return nil
 }
 
 func (repo *PgsqlRepo) Delete(groupId uuid.UUID) error {

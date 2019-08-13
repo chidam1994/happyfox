@@ -112,7 +112,22 @@ delete group-
 	response -
 	{"success":true}
 
+update group
+	{{host}}/group/{action}
+	method - put
+	valid values for action param - (rename,addmembers,remmembers)
+	request -
+	{
+		"group_id":"45238a44-efad-4a1a-a746-e47159b0e7d3",
+		"name":"testrenamegroup",
+		"members":["78528dab-75af-4450-a8e0-fa38598a9e0c"]
+	}
+
+	note: name must be present in req body if action is rename and members must be present for other actions
+	response -
+	{"success":true}
+
 Note-
 	*validations have been added for all the request parameters and request body
 	*appropriate errors with the proper http status code will be returned in case of error
-	*apis to update the resources are yet to be implemented.
+	*apis to update contacts are not yet added.

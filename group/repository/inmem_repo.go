@@ -55,8 +55,9 @@ func (repo *InMemRepo) GetMembersCount(groupId uuid.UUID, memberIds []uuid.UUID)
 	return count, nil
 }
 
-func (repo *InMemRepo) RenameGroup(groupId uuid.UUID, name string) error {
-	panic("not implemented")
+func (repo *InMemRepo) RenameGroup(group *models.Group) error {
+	repo.groupsMap[group.Id] = group
+	return nil
 }
 
 func (repo *InMemRepo) Delete(groupId uuid.UUID) error {
@@ -76,7 +77,7 @@ func (repo *InMemRepo) FindByName(name string) (*models.Group, error) {
 func (repo *InMemRepo) FindById(groupId uuid.UUID) (*models.Group, error) {
 	group, ok := repo.groupsMap[groupId]
 	if !ok {
-		return nil, errors.New("Contact Not found")
+		return nil, errors.New("Group Not found")
 	}
 	return group, nil
 }

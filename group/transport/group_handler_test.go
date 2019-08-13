@@ -36,6 +36,9 @@ func (mockSvc *mockGroupService) AddMembers(groupId uuid.UUID, memberIds []uuid.
 func (mockSvc *mockGroupService) RemMembers(groupId uuid.UUID, memberIds []uuid.UUID) error {
 	return nil
 }
+func (mockSvc *mockGroupService) RenameGroup(groupId uuid.UUID, name string) error {
+	return nil
+}
 
 func TestCreateGroup(t *testing.T) {
 	group := &CreateGroupRequest{

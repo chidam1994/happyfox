@@ -23,52 +23,6 @@ func (repo *InMemRepo) Save(contact *models.Contact) (uuid.UUID, error) {
 	return contact.Id, nil
 }
 
-func (repo *InMemRepo) AddEmail(contactId uuid.UUID, email *models.Email) (err error) {
-	contact, ok := repo.contactsMap[contactId]
-	if !ok {
-		return errors.New("Contact Not found")
-	}
-	contact.Emails = append(contact.Emails, email)
-	return
-}
-
-func (repo *InMemRepo) RemEmail(contactId uuid.UUID, email string) (err error) {
-	contact, ok := repo.contactsMap[contactId]
-	if !ok {
-		return errors.New("Contact Not found")
-	}
-	for i := range contact.Emails {
-		if contact.Emails[i].Id == email {
-			contact.Emails = append(contact.Emails[:i], contact.Emails[i+1])
-			break
-		}
-	}
-	return
-}
-
-func (repo *InMemRepo) AddPhNum(contactId uuid.UUID, phNum *models.PhNum) (err error) {
-	contact, ok := repo.contactsMap[contactId]
-	if !ok {
-		return errors.New("Contact Not found")
-	}
-	contact.PhNums = append(contact.PhNums, phNum)
-	return
-}
-
-func (repo *InMemRepo) RemPhNum(contactId uuid.UUID, phNum string) (err error) {
-	contact, ok := repo.contactsMap[contactId]
-	if !ok {
-		return errors.New("Contact Not found")
-	}
-	for i := range contact.PhNums {
-		if contact.PhNums[i].Number == phNum {
-			contact.PhNums = append(contact.PhNums[:i], contact.PhNums[i+1])
-			break
-		}
-	}
-	return
-}
-
 func (repo *InMemRepo) Delete(contactId uuid.UUID) (err error) {
 	delete(repo.contactsMap, contactId)
 	return nil
@@ -127,30 +81,4 @@ func (repo *InMemRepo) FindByName(name string) (contact *models.Contact, err err
 		}
 	}
 	return nil, nil
-}
-
-func (repo *InMemRepo) FindEmail(contactId uuid.UUID, emailstr string) (email *models.Email, err error) {
-	contact, ok := repo.contactsMap[contactId]
-	if !ok {
-		return nil, errors.New("Contact Not found")
-	}
-	for _, email = range contact.Emails {
-		if email.Id == emailstr {
-			return
-		}
-	}
-	return nil, errors.New("Email Id not found")
-}
-
-func (repo *InMemRepo) FindPhNum(contactId uuid.UUID, phNumstr string) (phNum *models.PhNum, err error) {
-	contact, ok := repo.contactsMap[contactId]
-	if !ok {
-		return nil, errors.New("Contact Not found")
-	}
-	for _, phNum = range contact.PhNums {
-		if phNum.Number == phNumstr {
-			return
-		}
-	}
-	return nil, errors.New("phone number not found")
 }

@@ -74,3 +74,20 @@ func TestRemMembers(t *testing.T) {
 	err = svc.RemMembers(id, []uuid.UUID{memId2})
 	assert.Error(t, err)
 }
+
+func TestRenameGroup(t *testing.T) {
+	repo := repository.NewInMemRepo()
+	svc := NewService(repo)
+	memId1 := uuid.New()
+	memId2 := uuid.New()
+	group := &models.Group{
+		Name:    "testGroup",
+		Members: []*models.Member{&models.Member{MemberId: memId1}, &models.Member{MemberId: memId2}},
+	}
+	id, err := svc.SaveGroup(group)
+	assert.Nil(t, err)
+	err = svc.RenameGroup(id, "renamedGroup")
+	assert.NoError(t, err)
+	err = svc.RenameGroup(uuid.New(), "renamedGroup")
+	assert.Error(t, err)
+}

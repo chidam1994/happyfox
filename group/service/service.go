@@ -87,6 +87,19 @@ func (svc *groupService) RemMembers(groupId uuid.UUID, memberIds []uuid.UUID) er
 	return svc.repo.RemMembers(groupId, memberIds)
 }
 
+func (svc *groupService) RenameGroup(groupId uuid.UUID, name string) error {
+	group, err := svc.repo.FindById(groupId)
+	if err != nil {
+		return err
+	}
+	if group == nil {
+		return utils.GetAppError(errors.New("The group you're trying to rename doesnt exist"), "Unable to rename group", http.StatusBadRequest)
+	}
+	group.UpdatedAt = time.Now()
+	group.Name = name
+	return svc.repo.RenameGroup(group)
+}
+
 func beforeSave(group *models.Group, groupId uuid.UUID) {
 	now := time.Now()
 	for i := range group.Members {
