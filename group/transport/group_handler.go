@@ -18,7 +18,7 @@ func (handler *groupHandler) createGroup(w http.ResponseWriter, r *http.Request)
 	var body *CreateGroupRequest
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
-		w = utils.GetBadReqResponse(w, "error decoding json body")
+		w = utils.GetBadReqResponse(w, err.Error())
 		return
 	}
 	group, err := body.Validate()
